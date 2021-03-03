@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.superheros.apirest.models.dao.IHeroDao;
@@ -16,8 +17,16 @@ public class HeroServiceImpl implements IHeroService {
 	private IHeroDao heroDao;
 
 	@Override
+	@Cacheable("heros")
 	@Transactional(readOnly = true)
 	public List<Hero> findAll() {
+		//Prueba de cacheo de peticiones
+		try {
+		      long time = 3000L;
+		      Thread.sleep(time);
+		    } catch (InterruptedException e) {
+		      throw new IllegalStateException(e);
+		    }
 		return (List<Hero>)heroDao.findAll();
 	}
 
@@ -34,6 +43,7 @@ public class HeroServiceImpl implements IHeroService {
 	}
 
 	@Override
+	@Cacheable("heros")
 	@Transactional(readOnly = true)
 	public Optional<Hero> findById(Long id) {
 		
@@ -51,6 +61,7 @@ public class HeroServiceImpl implements IHeroService {
 	}
 	
 	@Override
+	@Cacheable("heros")
 	@Transactional(readOnly = true)
 	public List<Hero> findByNameContains(String name){
 		

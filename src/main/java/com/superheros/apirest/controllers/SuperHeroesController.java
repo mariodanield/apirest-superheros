@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -24,6 +25,7 @@ import com.superheros.apirest.models.services.IHeroService;
 
 
 @RestController
+@EnableCaching //habilitando el cacheo de peticiones
 @RequestMapping("/api/superHeroes")
 public class SuperHeroesController {
 
@@ -76,14 +78,14 @@ public class SuperHeroesController {
 	
 	@LogExecutionTime
 	@DeleteMapping("/deleteById/{id}")
-	public ResponseEntity deleteById(@PathVariable("id") Long id) throws ResourceNotFoundException {
+	public ResponseEntity<?> deleteById(@PathVariable("id") Long id) throws ResourceNotFoundException {
 		logger.info("Start service rest /deleteById/{id}.");
 		Boolean result = heroService.deleteById(id);
 		logger.info("End service rest /deleteById/{id}.");
 		if (!result) {
 			throw new ResourceNotFoundException("Hero not found with id " + id);
 		}
-		return new ResponseEntity<Boolean>(HttpStatus.NO_CONTENT);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 	
 }
