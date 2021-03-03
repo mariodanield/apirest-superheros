@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.MethodMode;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -43,17 +44,20 @@ class SuperHeroesControllerIntegrationTest {
 	private MockMvc mockMvc;
 
 	@Test
+	@WithMockUser(username = "user", roles = "USER")
 	public void testFindAll() throws Exception {
 		this.mockMvc.perform(get("/api/superHeroes/findAll")).andExpect(status().isOk());
 	}
 
 	@Test
+	@WithMockUser(username = "user", roles = "USER")
 	public void testFindById() throws Exception {
 		this.mockMvc.perform(get("/api/superHeroes/findById/{id}","100")).andExpect(status().isNotFound());
 		this.mockMvc.perform(get("/api/superHeroes/findById/{id}","1")).andExpect(status().isOk());
 	}
 	
 	@Test
+	@WithMockUser(username = "user", roles = "USER")
 	public void testFindByNameContains() throws Exception {
 		this.mockMvc.perform(get("/api/superHeroes/findByNameContains/{name}","1")).andExpect(status().isNotFound());
 		this.mockMvc.perform(get("/api/superHeroes/findByNameContains/{name}","man")).andExpect(status().isOk());
@@ -61,6 +65,7 @@ class SuperHeroesControllerIntegrationTest {
 	
 	@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
 	@Test
+	@WithMockUser(username = "admin", roles = "ADMIN")
 	void testSaveHero() throws JsonProcessingException, Exception {
 		Hero hero = new Hero("Daniel", 28, "Force");
 
@@ -80,6 +85,7 @@ class SuperHeroesControllerIntegrationTest {
 
 	@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
 	@Test
+	@WithMockUser(username = "admin", roles = "ADMIN")
 	void testDeleteById() throws JsonProcessingException, Exception {
 	    mockMvc.perform(delete("/api/superHeroes/deleteById/{id}", 5))
 		    	.andExpect(status().isNoContent());
@@ -88,5 +94,4 @@ class SuperHeroesControllerIntegrationTest {
 	    assertFalse(heroResult.isPresent());
 	}
 
-	
 }
