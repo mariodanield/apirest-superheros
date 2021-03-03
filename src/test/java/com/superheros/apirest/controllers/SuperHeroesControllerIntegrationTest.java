@@ -82,6 +82,39 @@ class SuperHeroesControllerIntegrationTest {
 	    assertThat(heroResult.get(0).getAge()).isEqualTo(28);
 	    assertThat(heroResult.get(0).getPower()).isEqualTo("Force");
 	}
+	
+	@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
+	@Test
+	void testSaveHeroUnauthorized() throws JsonProcessingException, Exception {
+		Hero hero = new Hero("Daniel", 28, "Force");
+
+	    mockMvc.perform(post("/api/superHeroes/saveHero")
+		    	.content(objectMapper.writeValueAsString(hero))
+		    	.contentType(MediaType.APPLICATION_JSON)
+		    	.accept(MediaType.APPLICATION_JSON))
+		    	.andExpect(status().isUnauthorized());
+
+	    List<Hero> heroResult = heroService.findByNameContains("Daniel");
+	    assertNotNull(heroResult);
+	    assertEquals(0, heroResult.size());
+	}
+	
+	@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
+	@Test
+	@WithMockUser(username = "user", roles = "USER")
+	void testSaveHeroForbidden() throws JsonProcessingException, Exception {
+		Hero hero = new Hero("Daniel", 28, "Force");
+
+	    mockMvc.perform(post("/api/superHeroes/saveHero")
+		    	.content(objectMapper.writeValueAsString(hero))
+		    	.contentType(MediaType.APPLICATION_JSON)
+		    	.accept(MediaType.APPLICATION_JSON))
+		    	.andExpect(status().isForbidden());
+
+	    List<Hero> heroResult = heroService.findByNameContains("Daniel");
+	    assertNotNull(heroResult);
+	    assertEquals(0, heroResult.size());
+	}
 
 	@DirtiesContext(methodMode = MethodMode.AFTER_METHOD)
 	@Test
